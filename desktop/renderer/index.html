@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Rastreio de Encomendas</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Rastreio de Encomendas</h1>
+      <button id="refresh">Atualizar</button>
+    </header>
+
+    <nav id="filters">
+      <button data-filter="todos" class="active">Todos</button>
+      <button data-filter="aguardando">Aguardando</button>
+      <button data-filter="em_transito">Em trânsito</button>
+      <button data-filter="entregue">Entregue</button>
+    </nav>
+
+    <table id="packages">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Status</th>
+          <th>Último evento</th>
+          <th>Data</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <p id="empty-state" hidden>Nenhum pacote nessa categoria.</p>
+
+    <dialog id="detail">
+      <h2 id="detail-code"></h2>
+      <dl>
+        <dt>Tipo</dt>
+        <dd id="detail-type"></dd>
+        <dt>Previsão de entrega</dt>
+        <dd id="detail-eta"></dd>
+        <dt>Status atual</dt>
+        <dd id="detail-status"></dd>
+      </dl>
+      <h3>Histórico</h3>
+      <ul id="detail-history"></ul>
+      <button id="detail-close">Fechar</button>
+    </dialog>
+
+    <script src="renderer.js"></script>
+  </body>
+</html>

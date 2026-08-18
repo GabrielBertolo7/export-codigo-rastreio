@@ -1,0 +1,10 @@
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+release/
+Rastreio de Encomendas - executavel/
+Rastreio de Encomendas - executavel.zip
+*.log
+data/

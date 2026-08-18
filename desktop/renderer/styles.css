@@ -1,0 +1,179 @@
+:root {
+  color-scheme: light;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --border: #ddd;
+  --muted: #666;
+  --bg-aguardando: #fef3c7;
+  --fg-aguardando: #92400e;
+  --bg-em_transito: #dbeafe;
+  --fg-em_transito: #1e40af;
+  --bg-entregue: #dcfce7;
+  --fg-entregue: #166534;
+}
+
+body {
+  margin: 0;
+  padding: 1.5rem;
+  background: #fff;
+  color: #111;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+button {
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: #f5f5f5;
+  border-radius: 6px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.9rem;
+}
+
+button:hover {
+  background: #eee;
+}
+
+#filters {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+#filters button.active {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+th {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.clickable-row {
+  cursor: pointer;
+}
+
+.clickable-row:hover {
+  background: #f9f9f9;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.badge-aguardando {
+  background: var(--bg-aguardando);
+  color: var(--fg-aguardando);
+}
+
+.badge-em_transito {
+  background: var(--bg-em_transito);
+  color: var(--fg-em_transito);
+}
+
+.badge-entregue {
+  background: var(--bg-entregue);
+  color: var(--fg-entregue);
+}
+
+#empty-state {
+  color: var(--muted);
+  text-align: center;
+  margin-top: 2rem;
+}
+
+#detail {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  width: min(480px, 90vw);
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+#detail::backdrop {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+#detail h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+}
+
+#detail h3 {
+  font-size: 0.95rem;
+  margin: 1rem 0 0.5rem;
+}
+
+#detail dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 0.75rem;
+  margin: 0;
+}
+
+#detail dt {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+#detail dd {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+#detail-history {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-left: 2px solid var(--border);
+}
+
+#detail-history li {
+  padding: 0.4rem 0 0.4rem 0.9rem;
+  margin-left: -1px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.history-date {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.history-desc {
+  font-size: 0.9rem;
+}
+
+#detail-close {
+  margin-top: 1rem;
+}

@@ -1,0 +1,57 @@
+{
+  "name": "export-codigo-rastreio",
+  "version": "1.0.0",
+  "description": "Captura codigos de rastreio dos Correios enviados no Telegram e mostra o status num painel desktop unico, consultado sob demanda via API PacoteVicio",
+  "author": "Gabriel Bertolo",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gabrielbertolo7/export-codigo-rastreio.git"
+  },
+  "main": "dist/desktop/main.js",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "npm run build && electron .",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "postinstall": "electron-builder install-app-deps",
+    "dist": "npm run build && electron-builder --win portable"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.10.0",
+    "dotenv": "^16.4.5",
+    "grammy": "^1.31.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/node": "^22.10.5",
+    "electron": "^36.9.5",
+    "electron-builder": "latest",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "build": {
+    "appId": "com.gabrielappco.rastreio-encomendas",
+    "productName": "Rastreio de Encomendas",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "desktop/renderer/**/*",
+      "desktop/assets/**/*",
+      "package.json"
+    ],
+    "asarUnpack": [
+      "**/*.node"
+    ],
+    "win": {
+      "target": "portable",
+      "icon": "desktop/assets/icon.ico"
+    }
+  }
+}
