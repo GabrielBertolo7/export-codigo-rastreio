@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Captura codigos de rastreio dos Correios enviados no Telegram e mostra o status num painel desktop unico, consultado sob demanda via API PacoteVicio",
   "author": "Gabriel Bertolo",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gabrielbertolo7/export-codigo-rastreio.git"

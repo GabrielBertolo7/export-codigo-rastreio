@@ -5,7 +5,6 @@
 ![Electron](https://img.shields.io/badge/Electron-36-47848F?logo=electron&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-better--sqlite3-003B57?logo=sqlite&logoColor=white)
 ![Vitest](https://img.shields.io/badge/tests-vitest-6E9F18?logo=vitest&logoColor=white)
-![License](https://img.shields.io/badge/license-MIT-blue)
 
 Programa único (Windows) que captura automaticamente os códigos de rastreio dos Correios (formato `NN000000000BR`) enviados por um fornecedor num grupo do Telegram, e mostra o status de cada um numa tela, consultado sob demanda na API do PacoteVício.
 
@@ -131,7 +130,3 @@ desktop/                         # app Electron -- unico processo, roda o bot e 
 - **Repository** (`src/db/index.ts`): `PackageRepository` concentra o schema, as migrações e os prepared statements da tabela `packages` num único ponto de acesso, em vez de statements soltos no módulo.
 - **Provider** (`src/tracking/pacotevicio.ts`): a interface `TrackingProvider` separa "consultar o status de um rastreio" de "como a API do PacoteVício responde"; `poller.ts` depende só da interface.
 - Canais de IPC entre o processo principal e a janela ficam centralizados em `desktop/ipcChannels.ts`, usado tanto por `main.ts` quanto por `preload.ts`.
-
-## Licença
-
-[MIT](LICENSE)
