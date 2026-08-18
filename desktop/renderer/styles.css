@@ -110,6 +110,31 @@ th {
   margin-top: 2rem;
 }
 
+#context-menu {
+  position: fixed;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  padding: 0.25rem;
+  z-index: 10;
+}
+
+#context-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: none;
+  border-radius: 4px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+#context-menu button:hover {
+  background: #f2f2f2;
+}
+
 #detail {
   border: 1px solid var(--border);
   border-radius: 10px;

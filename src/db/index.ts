@@ -31,6 +31,7 @@ class PackageRepository {
   private readonly listActiveStmt: Database.Statement;
   private readonly listAllStmt: Database.Statement;
   private readonly getByCodeStmt: Database.Statement;
+  private readonly removeStmt: Database.Statement;
 
   constructor(dbPath: string) {
     mkdirSync(dirname(dbPath), { recursive: true });
@@ -60,6 +61,7 @@ class PackageRepository {
     );
     this.listAllStmt = this.db.prepare(`SELECT * FROM packages ORDER BY first_seen_at DESC`);
     this.getByCodeStmt = this.db.prepare(`SELECT * FROM packages WHERE code = ?`);
+    this.removeStmt = this.db.prepare(`DELETE FROM packages WHERE code = ?`);
   }
 
   private criarSchema(): void {
@@ -122,6 +124,11 @@ class PackageRepository {
 
   getByCode(code: string): PackageRow | undefined {
     return this.getByCodeStmt.get(code) as PackageRow | undefined;
+  }
+
+  /** Remove o registro do pacote, se ele existir. O código volta a ser capturável caso apareça de novo no grupo. */
+  remove(code: string): void {
+    this.removeStmt.run(code);
   }
 
   /** Todos os pacotes prontos pro painel: categoria calculada e historico desserializado. */
