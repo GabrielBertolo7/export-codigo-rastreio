@@ -7,6 +7,7 @@ const CATEGORY_LABELS = {
 const state = {
   packages: [],
   filter: "todos",
+  search: "",
   connected: true,
 };
 
@@ -14,6 +15,7 @@ const tbody = document.querySelector("#packages tbody");
 const emptyState = document.querySelector("#empty-state");
 const detailDialog = document.querySelector("#detail");
 const refreshButton = document.querySelector("#refresh");
+const searchInput = document.querySelector("#search");
 
 async function loadPackages() {
   const result = await window.api.listPackages();
@@ -110,6 +112,10 @@ function createPackageRow(pkg) {
   return tr;
 }
 
+function matchesSearch(pkg, term) {
+  return term === "" || pkg.code.toLowerCase().includes(term);
+}
+
 function render() {
   if (!state.connected) {
     tbody.replaceChildren();
@@ -119,8 +125,11 @@ function render() {
     return;
   }
 
+  const searchTerm = state.search.trim().toLowerCase();
   const filtered = state.packages.filter(
-    (pkg) => state.filter === "todos" || pkg.category === state.filter
+    (pkg) =>
+      (state.filter === "todos" || pkg.category === state.filter) &&
+      matchesSearch(pkg, searchTerm)
   );
 
   tbody.replaceChildren();
@@ -128,7 +137,10 @@ function render() {
     tbody.appendChild(createPackageRow(pkg));
   }
 
-  emptyState.textContent = "Nenhum pacote nessa categoria.";
+  emptyState.textContent =
+    searchTerm !== ""
+      ? "Nenhum pacote encontrado para essa busca."
+      : "Nenhum pacote nessa categoria.";
   emptyState.hidden = filtered.length > 0;
 }
 
@@ -140,6 +152,11 @@ document.querySelectorAll("#filters button").forEach((button) => {
       .forEach((b) => b.classList.toggle("active", b === button));
     render();
   });
+});
+
+searchInput.addEventListener("input", () => {
+  state.search = searchInput.value;
+  render();
 });
 
 refreshButton.addEventListener("click", refreshPackages);
