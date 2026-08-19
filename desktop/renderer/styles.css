@@ -46,6 +46,7 @@ button:hover {
 #search {
   display: block;
   width: 100%;
+  max-width: 280px;
   box-sizing: border-box;
   border: 1px solid var(--border);
   border-radius: 6px;
