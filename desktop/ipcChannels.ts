@@ -2,4 +2,5 @@
 export const IpcChannels = {
   packagesList: "packages:list",
   packagesRefresh: "packages:refresh",
+  packagesRemove: "packages:remove",
 } as const;

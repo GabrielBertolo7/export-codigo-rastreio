@@ -95,6 +95,16 @@ function registerIpcHandlers(
       return { ok: false, packages: [] };
     }
   });
+
+  ipcMain.handle(IpcChannels.packagesRemove, (_event, code: string): PackagesResult => {
+    try {
+      packageRepository.remove(code);
+      return { ok: true, packages: packageRepository.listAllForDisplay() };
+    } catch (err) {
+      console.error("Erro ao remover pacote:", err);
+      return { ok: false, packages: [] };
+    }
+  });
 }
 
 function startApp(): void {

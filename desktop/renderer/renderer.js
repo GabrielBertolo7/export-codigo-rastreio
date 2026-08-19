@@ -16,6 +16,10 @@ const emptyState = document.querySelector("#empty-state");
 const detailDialog = document.querySelector("#detail");
 const refreshButton = document.querySelector("#refresh");
 const searchInput = document.querySelector("#search");
+const contextMenu = document.querySelector("#context-menu");
+const contextMenuRemoveButton = document.querySelector("#context-menu-remove");
+
+let contextMenuCode = null;
 
 async function loadPackages() {
   const result = await window.api.listPackages();
@@ -88,10 +92,26 @@ function openDetail(code) {
   detailDialog.showModal();
 }
 
+function openContextMenu(event, code) {
+  contextMenuCode = code;
+  contextMenu.style.left = `${event.clientX}px`;
+  contextMenu.style.top = `${event.clientY}px`;
+  contextMenu.hidden = false;
+}
+
+function closeContextMenu() {
+  contextMenu.hidden = true;
+  contextMenuCode = null;
+}
+
 function createPackageRow(pkg) {
   const tr = document.createElement("tr");
   tr.className = "clickable-row";
   tr.addEventListener("click", () => openDetail(pkg.code));
+  tr.addEventListener("contextmenu", (event) => {
+    event.preventDefault();
+    openContextMenu(event, pkg.code);
+  });
 
   const codeCell = document.createElement("td");
   codeCell.textContent = pkg.code;
@@ -163,5 +183,23 @@ refreshButton.addEventListener("click", refreshPackages);
 document
   .querySelector("#detail-close")
   .addEventListener("click", () => detailDialog.close());
+
+contextMenuRemoveButton.addEventListener("click", async () => {
+  const code = contextMenuCode;
+  closeContextMenu();
+  if (!code) return;
+  if (!confirm(`Remover o registro do pacote ${code}? Essa ação não pode ser desfeita.`)) {
+    return;
+  }
+  const result = await window.api.removePackage(code);
+  state.connected = result.ok;
+  state.packages = result.packages;
+  render();
+});
+
+document.addEventListener("click", closeContextMenu);
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeContextMenu();
+});
 
 loadPackages();
