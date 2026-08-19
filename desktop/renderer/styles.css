@@ -43,6 +43,18 @@ button:hover {
   background: #eee;
 }
 
+#search {
+  display: block;
+  width: 100%;
+  max-width: 280px;
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
 #filters {
   display: flex;
   gap: 0.5rem;
