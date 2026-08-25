@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain, Tray, Menu, dialog } from "electron";
 import path from "node:path";
-import { appendFileSync } from "node:fs";
 import { IpcChannels } from "./ipcChannels";
+import { logEvent } from "../src/logger";
 // Import tardio (dentro do try/catch abaixo) de proposito: config.ts valida o
 // .env na primeira vez que e importado, e queremos capturar isso pra mostrar
 // um dialogo amigavel em vez de deixar o Electron crashar sem explicacao.
@@ -17,22 +17,6 @@ interface PackagesResult {
 
 let win: BrowserWindow | null = null;
 let tray: Tray | null = null;
-
-const logPath = path.join(
-  process.env.PORTABLE_EXECUTABLE_DIR ?? process.cwd(),
-  "error.log"
-);
-
-/** Como e um app grafico sem console, erros que passariam batido viram uma linha nesse arquivo. */
-function logEvent(context: string, err: unknown): void {
-  const line = `[${new Date().toISOString()}] ${context}: ${err instanceof Error ? (err.stack ?? err.message) : String(err)}\n`;
-  console.error(line);
-  try {
-    appendFileSync(logPath, line);
-  } catch {
-    // se nem isso der certo, nao ha mais o que fazer alem de logar no console
-  }
-}
 
 process.on("unhandledRejection", (reason) => logEvent("Unhandled Rejection", reason));
 process.on("uncaughtException", (err) => logEvent("Uncaught Exception", err));
