@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain, Tray, Menu, dialog } from "electron";
 import path from "node:path";
-import { appendFileSync } from "node:fs";
 import { IpcChannels } from "./ipcChannels";
+import { logEvent } from "../src/logger";
 // Import tardio (dentro do try/catch abaixo) de proposito: config.ts valida o
 // .env na primeira vez que e importado, e queremos capturar isso pra mostrar
 // um dialogo amigavel em vez de deixar o Electron crashar sem explicacao.
@@ -17,22 +17,6 @@ interface PackagesResult {
 
 let win: BrowserWindow | null = null;
 let tray: Tray | null = null;
-
-const logPath = path.join(
-  process.env.PORTABLE_EXECUTABLE_DIR ?? process.cwd(),
-  "error.log"
-);
-
-/** Como e um app grafico sem console, erros que passariam batido viram uma linha nesse arquivo. */
-function logEvent(context: string, err: unknown): void {
-  const line = `[${new Date().toISOString()}] ${context}: ${err instanceof Error ? (err.stack ?? err.message) : String(err)}\n`;
-  console.error(line);
-  try {
-    appendFileSync(logPath, line);
-  } catch {
-    // se nem isso der certo, nao ha mais o que fazer alem de logar no console
-  }
-}
 
 process.on("unhandledRejection", (reason) => logEvent("Unhandled Rejection", reason));
 process.on("uncaughtException", (err) => logEvent("Uncaught Exception", err));
@@ -52,6 +36,22 @@ function createWindow(): void {
     },
   });
   win.loadFile(path.join(rendererDir, "index.html"));
+
+  // DEBUG: espelha o console da janela (renderer) pro error.log -- inclui
+  // promises rejeitadas nao tratadas, que o Chromium ja imprime no console
+  // mas que hoje nao aparecem em lugar nenhum visivel no .exe empacotado.
+  win.webContents.on("console-message", (_event, level, message, line, sourceId) => {
+    if (level >= 2) {
+      logEvent("DEBUG console do renderer", `[nivel ${level}] ${message} (${sourceId}:${line})`);
+    }
+  });
+
+  // DEBUG: dispara se o preload.js falhar ao carregar/executar -- se isso
+  // acontecer, window.api nunca e exposto e a tela fica com a tabela vazia
+  // sem nenhum erro visivel, mesmo com o banco tendo dados.
+  win.webContents.on("preload-error", (_event, preloadPath, error) => {
+    logEvent("DEBUG erro ao carregar preload", `path=${preloadPath} erro=${error}`);
+  });
 
   // Fechar a janela (X) so esconde -- o listener do Telegram precisa continuar
   // rodando em segundo plano pra nao perder mensagens.
