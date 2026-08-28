@@ -33,6 +33,14 @@ function createWindow(): void {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
       nodeIntegration: false,
+      // O preload script importa modulos locais (./ipcChannels) via require
+      // relativo. Em modo sandbox (padrao desde o Electron 20), o carregador
+      // de preload nao resolve imports locais dentro do .asar empacotado --
+      // o preload falhava silenciosamente e "window.api" nunca era exposto.
+      // Seguro desabilitar aqui: a janela so carrega o index.html local do
+      // proprio app, nunca conteudo remoto; contextIsolation/nodeIntegration
+      // continuam sendo a proteção que importa.
+      sandbox: false,
     },
   });
   win.loadFile(path.join(rendererDir, "index.html"));
