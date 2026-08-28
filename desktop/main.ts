@@ -37,6 +37,22 @@ function createWindow(): void {
   });
   win.loadFile(path.join(rendererDir, "index.html"));
 
+  // DEBUG: espelha o console da janela (renderer) pro error.log -- inclui
+  // promises rejeitadas nao tratadas, que o Chromium ja imprime no console
+  // mas que hoje nao aparecem em lugar nenhum visivel no .exe empacotado.
+  win.webContents.on("console-message", (_event, level, message, line, sourceId) => {
+    if (level >= 2) {
+      logEvent("DEBUG console do renderer", `[nivel ${level}] ${message} (${sourceId}:${line})`);
+    }
+  });
+
+  // DEBUG: dispara se o preload.js falhar ao carregar/executar -- se isso
+  // acontecer, window.api nunca e exposto e a tela fica com a tabela vazia
+  // sem nenhum erro visivel, mesmo com o banco tendo dados.
+  win.webContents.on("preload-error", (_event, preloadPath, error) => {
+    logEvent("DEBUG erro ao carregar preload", `path=${preloadPath} erro=${error}`);
+  });
+
   // Fechar a janela (X) so esconde -- o listener do Telegram precisa continuar
   // rodando em segundo plano pra nao perder mensagens.
   win.on("close", (event) => {
