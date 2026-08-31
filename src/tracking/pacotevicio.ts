@@ -44,6 +44,36 @@ const DELIVERED_PATTERN = /entregue/i;
 
 const RAPIDAPI_HOST = "correios-rastreamento-de-encomendas.p.rapidapi.com";
 
+// Em lotes grandes de pacotes a API pode responder 429 (limite de requisicoes
+// por janela curta), mesmo com cota mensal sobrando. Nesses casos vale a pena
+// esperar e tentar de novo em vez de desistir do pacote.
+const MAX_ATTEMPTS = 4;
+const RETRY_DELAY_MS = 3000;
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchWithRetryOn429(url: string): Promise<Response> {
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    const response = await fetch(url, {
+      headers: {
+        "x-rapidapi-host": RAPIDAPI_HOST,
+        "x-rapidapi-key": config.rapidApiKey,
+      },
+    });
+
+    if (response.status !== 429 || attempt === MAX_ATTEMPTS) {
+      return response;
+    }
+
+    await sleep(RETRY_DELAY_MS);
+  }
+
+  // Inalcancavel (o loop sempre retorna no ultimo attempt), so pra satisfazer o TS.
+  throw new Error("fetchWithRetryOn429: loop encerrou sem retornar");
+}
+
 /** Converte os eventos crus da API pro formato interno, do mais recente pro mais antigo (a API nao garante ordem). */
 function parseEvents(eventos: PacoteVicioEvento[]): TrackingEvent[] {
   const sortedEventos = [...eventos].sort((a, b) =>
@@ -64,12 +94,7 @@ export async function fetchTrackingStatus(
 ): Promise<TrackingUpdate | null> {
   const url = `https://${RAPIDAPI_HOST}/track?tracking_code=${encodeURIComponent(trackingCode)}&confidence_level=high`;
 
-  const response = await fetch(url, {
-    headers: {
-      "x-rapidapi-host": RAPIDAPI_HOST,
-      "x-rapidapi-key": config.rapidApiKey,
-    },
-  });
+  const response = await fetchWithRetryOn429(url);
 
   if (!response.ok) {
     throw new Error(
