@@ -129,4 +129,52 @@ describe("fetchTrackingStatus", () => {
     mockFetchOnce({}, false, 404);
     await expect(fetchTrackingStatus("NN000000000BR")).rejects.toThrow();
   });
+
+  it("tenta de novo quando a API responde 429, e funciona se uma tentativa seguinte der certo", async () => {
+    vi.useFakeTimers();
+
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: false, status: 429, json: async () => ({}) })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          correios_object: {
+            situacao: "T",
+            eventos: [
+              {
+                descricaoFrontEnd: "Objeto postado",
+                dtHrCriado: { date: "2026-08-20 10:00:00.000000" },
+              },
+            ],
+          },
+        }),
+      });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const resultPromise = fetchTrackingStatus("NN340059206BR");
+    await vi.runAllTimersAsync();
+    const result = await resultPromise;
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(result?.description).toBe("Objeto postado");
+
+    vi.useRealTimers();
+  });
+
+  it("desiste depois de esgotar as tentativas com 429 seguido", async () => {
+    vi.useFakeTimers();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: false, status: 429, json: async () => ({}) })
+    );
+
+    const resultPromise = fetchTrackingStatus("NN340059206BR");
+    const assertion = expect(resultPromise).rejects.toThrow();
+    await vi.runAllTimersAsync();
+    await assertion;
+
+    vi.useRealTimers();
+  });
 });
