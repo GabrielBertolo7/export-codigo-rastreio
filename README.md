@@ -8,6 +8,25 @@
 
 Programa único (Windows) que captura automaticamente os códigos de rastreio dos Correios (formato `NN000000000BR`) enviados por um fornecedor num grupo do Telegram, e mostra o status de cada um numa tela, consultado sob demanda na API do PacoteVício.
 
+## Em resumo
+
+**Problema:** quem recebe os códigos de rastreio de um fornecedor pelo Telegram precisa copiar cada código e consultar
+o site dos Correios um a um para saber onde está cada encomenda.
+
+**Solução:** um programa de Windows que fica na bandeja do sistema, lê o grupo do Telegram, guarda cada código sem
+duplicar e mostra o status de todas as encomendas numa tela, com histórico completo de eventos.
+
+**Destaques**
+
+- Captura automática dos códigos enviados no grupo (bot do Telegram, extração por regex testada).
+- Consulta só quando você pede, para respeitar a cota gratuita da API e parar de consultar o que já foi entregue.
+- Entrega em um único `.exe` portátil, sem instalador.
+- Testes automatizados da extração de códigos, da classificação de status e da leitura da API.
+
+| Lista de encomendas | Detalhes e histórico |
+| --- | --- |
+| ![Lista de encomendas (dados de exemplo)](docs/img/lista.png) | ![Detalhe de uma encomenda (dados de exemplo)](docs/img/detalhe.png) |
+
 ## Como funciona
 
 1. Você, o fornecedor e um bot do Telegram estão num grupo.
