@@ -2,62 +2,114 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <title>Rastreio de Encomendas</title>
+    <title data-i18n="appTitle">Rastreio de Encomendas</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header>
-      <h1>Rastreio de Encomendas</h1>
-      <button id="refresh">Atualizar</button>
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 8l-9-5-9 5 9 5 9-5z" />
+            <path d="M3 8v8l9 5 9-5V8" />
+            <path d="M12 13v8" />
+          </svg>
+        </div>
+        <div>
+          <h1 data-i18n="appTitle">Rastreio de Encomendas</h1>
+          <p class="subtitle" id="subtitle"></p>
+        </div>
+      </div>
+      <button id="refresh" class="btn-primary">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+          <path d="M21 3v6h-6" />
+        </svg>
+        <span id="refresh-label" data-i18n="refresh">Atualizar</span>
+      </button>
     </header>
 
-    <input
-      type="search"
-      id="search"
-      placeholder="Buscar por código de rastreio..."
-      autocomplete="off"
-    />
+    <section class="summary" id="summary">
+      <div class="summary-card" data-category="aguardando">
+        <span class="summary-label"><span class="dot"></span><span data-i18n="cat_aguardando">Aguardando</span></span>
+        <strong class="summary-count" id="count-aguardando">0</strong>
+      </div>
+      <div class="summary-card" data-category="em_transito">
+        <span class="summary-label"><span class="dot"></span><span data-i18n="cat_em_transito">Em trânsito</span></span>
+        <strong class="summary-count" id="count-em_transito">0</strong>
+      </div>
+      <div class="summary-card" data-category="entregue">
+        <span class="summary-label"><span class="dot"></span><span data-i18n="cat_entregue">Entregue</span></span>
+        <strong class="summary-count" id="count-entregue">0</strong>
+      </div>
+    </section>
 
-    <nav id="filters">
-      <button data-filter="todos" class="active">Todos</button>
-      <button data-filter="aguardando">Aguardando</button>
-      <button data-filter="em_transito">Em trânsito</button>
-      <button data-filter="entregue">Entregue</button>
-    </nav>
+    <section class="panel">
+      <div class="toolbar">
+        <div class="search">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="M20 20l-3.5-3.5" />
+          </svg>
+          <input
+            type="search"
+            id="search"
+            data-i18n-placeholder="searchPlaceholder"
+            placeholder="Buscar por código de rastreio..."
+            autocomplete="off"
+          />
+        </div>
+        <nav id="filters" class="segmented">
+          <button data-filter="todos" class="active" data-i18n="filterAll">Todos</button>
+          <button data-filter="aguardando" data-i18n="cat_aguardando">Aguardando</button>
+          <button data-filter="em_transito" data-i18n="cat_em_transito">Em trânsito</button>
+          <button data-filter="entregue" data-i18n="cat_entregue">Entregue</button>
+        </nav>
+      </div>
 
-    <table id="packages">
-      <thead>
-        <tr>
-          <th>Código</th>
-          <th>Status</th>
-          <th>Último evento</th>
-          <th>Data</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+      <table id="packages">
+        <thead>
+          <tr>
+            <th data-i18n="colCode">Código</th>
+            <th data-i18n="colStatus">Status</th>
+            <th data-i18n="colLastEvent">Último evento</th>
+            <th data-i18n="colDate">Data</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
 
-    <p id="empty-state" hidden>Nenhum pacote nessa categoria.</p>
+      <p id="empty-state" hidden></p>
+    </section>
 
     <div id="context-menu" hidden>
-      <button id="context-menu-remove">Remover registro</button>
+      <button id="context-menu-remove" data-i18n="removeRecord">Remover registro</button>
     </div>
 
     <dialog id="detail">
-      <h2 id="detail-code"></h2>
+      <div class="detail-header">
+        <div>
+          <p class="detail-kicker" data-i18n="trackingCode">Código de rastreio</p>
+          <h2 id="detail-code"></h2>
+        </div>
+        <span id="detail-badge" class="badge"></span>
+      </div>
       <dl>
-        <dt>Tipo</dt>
+        <dt data-i18n="type">Tipo</dt>
         <dd id="detail-type"></dd>
-        <dt>Previsão de entrega</dt>
+        <dt data-i18n="eta">Previsão de entrega</dt>
         <dd id="detail-eta"></dd>
-        <dt>Status atual</dt>
+        <dt data-i18n="currentStatus">Status atual</dt>
         <dd id="detail-status"></dd>
       </dl>
-      <h3>Histórico</h3>
+      <h3 data-i18n="history">Histórico</h3>
       <ul id="detail-history"></ul>
-      <button id="detail-close">Fechar</button>
+      <div class="detail-actions">
+        <button id="detail-close" class="btn-secondary" data-i18n="close">Fechar</button>
+      </div>
     </dialog>
 
+    <script src="i18n.js"></script>
     <script src="renderer.js"></script>
   </body>
 </html>

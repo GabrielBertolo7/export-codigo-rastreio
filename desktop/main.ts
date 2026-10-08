@@ -43,7 +43,10 @@ function createWindow(): void {
       sandbox: false,
     },
   });
-  win.loadFile(path.join(rendererDir, "index.html"));
+  // APP_LANG=en opens the UI in English (used for portfolio screenshots); Portuguese is the default.
+  win.loadFile(path.join(rendererDir, "index.html"), {
+    query: { lang: process.env.APP_LANG === "en" ? "en" : "pt" },
+  });
 
   // DEBUG: espelha o console da janela (renderer) pro error.log -- inclui
   // promises rejeitadas nao tratadas, que o Chromium ja imprime no console

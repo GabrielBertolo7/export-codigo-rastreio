@@ -1,8 +1,5 @@
-const CATEGORY_LABELS = {
-  aguardando: "Aguardando",
-  em_transito: "Em trânsito",
-  entregue: "Entregue",
-};
+// Texts come from i18n.js (t, formatDate, LANG).
+const CATEGORIES = ["aguardando", "em_transito", "entregue"];
 
 const state = {
   packages: [],
@@ -15,6 +12,7 @@ const tbody = document.querySelector("#packages tbody");
 const emptyState = document.querySelector("#empty-state");
 const detailDialog = document.querySelector("#detail");
 const refreshButton = document.querySelector("#refresh");
+const refreshLabel = document.querySelector("#refresh-label");
 const searchInput = document.querySelector("#search");
 const contextMenu = document.querySelector("#context-menu");
 const contextMenuRemoveButton = document.querySelector("#context-menu-remove");
@@ -31,7 +29,7 @@ async function loadPackages() {
 /** Botao "Atualizar": dispara uma consulta de verdade na API PacoteVicio (via bot), nao so uma leitura do banco. */
 async function refreshPackages() {
   refreshButton.disabled = true;
-  refreshButton.textContent = "Atualizando...";
+  refreshLabel.textContent = t("refreshing");
   try {
     const result = await window.api.refreshPackages();
     state.connected = result.ok;
@@ -39,7 +37,7 @@ async function refreshPackages() {
     render();
   } finally {
     refreshButton.disabled = false;
-    refreshButton.textContent = "Atualizar";
+    refreshLabel.textContent = t("refresh");
   }
 }
 
@@ -49,7 +47,7 @@ function createHistoryItem(event) {
 
   const dateSpan = document.createElement("span");
   dateSpan.className = "history-date";
-  dateSpan.textContent = event.at;
+  dateSpan.textContent = formatDate(event.at);
 
   const descSpan = document.createElement("span");
   descSpan.className = "history-desc";
@@ -67,7 +65,7 @@ function renderHistory(events) {
 
   if (events.length === 0) {
     const li = document.createElement("li");
-    li.textContent = "Sem histórico ainda.";
+    li.textContent = t("noHistory");
     history.appendChild(li);
     return;
   }
@@ -82,8 +80,11 @@ function openDetail(code) {
 
   document.querySelector("#detail-code").textContent = pkg.code;
   document.querySelector("#detail-type").textContent = pkg.package_type ?? "-";
-  document.querySelector("#detail-eta").textContent =
-    pkg.estimated_delivery ?? "-";
+  document.querySelector("#detail-eta").textContent = formatDate(
+    pkg.estimated_delivery
+  );
+  const detailBadge = document.querySelector("#detail-badge");
+  detailBadge.replaceWith(createBadge(pkg.category, "detail-badge"));
   document.querySelector("#detail-status").textContent =
     pkg.last_event_description ?? "-";
 
@@ -114,19 +115,18 @@ function createPackageRow(pkg) {
   });
 
   const codeCell = document.createElement("td");
+  codeCell.className = "code-cell";
   codeCell.textContent = pkg.code;
 
   const statusCell = document.createElement("td");
-  const badge = document.createElement("span");
-  badge.className = `badge badge-${pkg.category}`;
-  badge.textContent = CATEGORY_LABELS[pkg.category] ?? pkg.category;
-  statusCell.appendChild(badge);
+  statusCell.appendChild(createBadge(pkg.category));
 
   const descriptionCell = document.createElement("td");
   descriptionCell.textContent = pkg.last_event_description ?? "-";
 
   const dateCell = document.createElement("td");
-  dateCell.textContent = pkg.last_event_at ?? "-";
+  dateCell.className = "date-cell";
+  dateCell.textContent = formatDate(pkg.last_event_at);
 
   tr.append(codeCell, statusCell, descriptionCell, dateCell);
   return tr;
@@ -136,11 +136,31 @@ function matchesSearch(pkg, term) {
   return term === "" || pkg.code.toLowerCase().includes(term);
 }
 
+function createBadge(category, id) {
+  const badge = document.createElement("span");
+  if (id) badge.id = id;
+  badge.className = `badge badge-${category}`;
+  const dot = document.createElement("span");
+  dot.className = "dot";
+  const label = document.createElement("span");
+  label.textContent = CATEGORIES.includes(category) ? t(`cat_${category}`) : category;
+  badge.append(dot, label);
+  return badge;
+}
+
+function renderSummary() {
+  for (const category of CATEGORIES) {
+    const count = state.packages.filter((p) => p.category === category).length;
+    document.querySelector(`#count-${category}`).textContent = String(count);
+  }
+  document.querySelector("#subtitle").textContent = t("subtitle", state.packages.length);
+}
+
 function render() {
+  renderSummary();
   if (!state.connected) {
     tbody.replaceChildren();
-    emptyState.textContent =
-      "Não foi possível carregar os pacotes. Tente clicar em Atualizar de novo.";
+    emptyState.textContent = t("loadError");
     emptyState.hidden = false;
     return;
   }
@@ -158,9 +178,7 @@ function render() {
   }
 
   emptyState.textContent =
-    searchTerm !== ""
-      ? "Nenhum pacote encontrado para essa busca."
-      : "Nenhum pacote nessa categoria.";
+    searchTerm !== "" ? t("emptySearch") : t("emptyCategory");
   emptyState.hidden = filtered.length > 0;
 }
 
@@ -188,7 +206,7 @@ contextMenuRemoveButton.addEventListener("click", async () => {
   const code = contextMenuCode;
   closeContextMenu();
   if (!code) return;
-  if (!confirm(`Remover o registro do pacote ${code}? Essa ação não pode ser desfeita.`)) {
+  if (!confirm(t("confirmRemove", code))) {
     return;
   }
   const result = await window.api.removePackage(code);
