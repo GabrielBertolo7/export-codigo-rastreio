@@ -22,6 +22,7 @@ duplicar e mostra o status de todas as encomendas numa tela, com histórico comp
 - Consulta só quando você pede, para respeitar a cota gratuita da API e parar de consultar o que já foi entregue.
 - Entrega em um único `.exe` portátil, sem instalador.
 - Testes automatizados da extração de códigos, da classificação de status e da leitura da API.
+- Interface em português; com `APP_LANG=en` ela abre em inglês.
 
 | Lista de encomendas | Detalhes e histórico |
 | --- | --- |
